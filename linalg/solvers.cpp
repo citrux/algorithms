@@ -40,3 +40,23 @@ v seidel( m A, v b, double eps )
     while ( norm( delta ) > eps && norm( delta ) / norm( x ) > eps );
     return x;
 }
+
+v sor( m A, v b, double w, double eps )
+{
+    auto n = b.size();
+    v x(n);
+    v delta(n);
+    do {
+        for (auto i = 0u; i < n; ++i)
+        {
+            double sum = 0;
+            for (auto j = 0u; j < n; ++j)
+                if (i != j)
+                    sum += A[i][j] * x[j];
+            delta[i] = (b[i] - sum) / A[i][i] - x[i];
+            x[i] += w * delta[i];
+        }
+    }
+    while ( norm( delta ) > eps && norm( delta ) / norm( x ) > eps );
+    return x;
+}

@@ -17,4 +17,11 @@ int main()
         std::cout << i << " ";
     std::cout << std::endl;
 
+    std::cout << "Проверка метода верхней релаксации:" << std::endl;
+    x = sor( A, b, 1.5 );
+    for ( auto i: x )
+        std::cout << i << " ";
+    std::cout << std::endl;
+
+
 }
