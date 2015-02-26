@@ -25,5 +25,4 @@ int main()
     std::cout << "bfs test:" << std::endl;
     used.assign(10, false);
     bfs(0, G, used);
-    return 0;
 }
