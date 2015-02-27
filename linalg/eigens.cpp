@@ -68,28 +68,44 @@ mat operator - (mat a, mat b)
     return a;
 }
 
+ostream & operator << (ostream &os, const vec &v)
+{
+    for(auto i : v)
+        os << i << " ";
+    return os;
+}
 double norm(vec a) {return sqrt(a * a);}
 
 void orthogonalize(vec & a, mat vs) { for (auto v : vs) a -= v * (v * a); }
 
 eigen maxEigenValue(mat A, mat O)
 {
-    double l = 0, eps = 1e-6;
+    double l = 0, l1 = 1, eps = 1e-6;
     vec x(A.size());
-    for (auto & i : x)
-        i = (double) rand() / RAND_MAX;
-    orthogonalize(x, O);
+    // перебираем базисные вектора в поисках некомпланарного
+    for (int i = 0; norm(x) < 10 * eps; ++i)
+    {
+        if(i)
+            x[i-1] = 0;
+        x[i] = 1;
+        orthogonalize(x, O);
+    }
+    // берём ортогональный заданным векторам вектор и начинаем искать
+    // максимальное из оставшихся собственных значений
     auto x1 = A * x;
-    while(abs(norm(x1) / norm(x) - l) > eps)
+    while(l1 - l > eps)
     {
         l = norm(x1) / norm(x);
-        x = x1;
+        // нормировка, ятобы числа быстро не росли и точность не падала:
+        x = x1 / norm(x1);
         x1 = A * x;
+        // поиск ортогональной компоненты
         orthogonalize(x1, O);
+        l1 = norm(x1) / norm(x);
     }
-    x = x * (1. / norm(x));
     if (x1 * x < 0 && l > 0)
         l = -l;
+    x = x1 / norm(x1);
     return {l, x};
 }
 
@@ -108,7 +124,6 @@ vector<eigen> getEigens(mat A)
 
 int main()
 {
-    srand (time(NULL));
     size_t n = 20;
     mat A(n);
     for (size_t i = 0; i < n; ++i)
@@ -123,5 +138,14 @@ int main()
         }
     }
     for (auto i : getEigens(A))
-        cout << i.l << endl;
+        cout << "l = " << i.l << ", v = " << i.v << endl << endl;
+
+    freopen("res.dat", "w", stdout);
+
+    for (size_t k = 0; k < n; ++k)
+    {
+        for (auto i : getEigens(A))
+            cout << i.v[k] << " ";
+        cout << endl;
+    }
 }
