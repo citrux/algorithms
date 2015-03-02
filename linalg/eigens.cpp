@@ -78,7 +78,7 @@ double norm(vec a) {return sqrt(a * a);}
 
 void orthogonalize(vec & a, mat vs) { for (auto v : vs) a -= v * (v * a); }
 
-eigen maxEigenValue(mat A, mat O)
+eigen maxEigenValue(mat A, mat O = {})
 {
     double l = 0, l1 = 1, eps = 1e-6;
     vec x(A.size());
@@ -125,27 +125,93 @@ vector<eigen> getEigens(mat A)
 int main()
 {
     size_t n = 20;
-    mat A(n);
-    for (size_t i = 0; i < n; ++i)
+    size_t m = 20;
+    double a = 5, b = 4;
+    double hx = a / m, hx2 = hx * hx, hy = b / n, hy2 = hy * hy;
+
+    mat A((n-1) * (m-1));
+    for (size_t i = 0; i < (n-1) * (m-1); ++i)
     {
-        A[i].assign(n, 0);
-        for (size_t j = 0; j < n; ++j)
+        A[i].assign((m-1) * (n-1), 0);
+        A[i][i] = 2. / hx2 + 2 / hy2;
+        if (i % (n-1))
+            A[i][i-1] = -1. / hx2;
+        if (i % (n-1) < n - 2)
+            A[i][i+1] = -1. / hx2;
+        if (i / (n-1))
+            A[i][i-(n-1)] = -1. / hy2;
+        if (i / (n-1) < m - 2)
+            A[i][i+(n-1)] = -1. / hy2;
+    }
+    auto x = maxEigenValue(A);
+    for (size_t i = 0; i < A.size(); ++i)
+        A[i][i] -= x.l;
+
+    mat vs = {};
+    vec lambdas = {};
+
+    // ищем 3 нижних гармоники
+    auto e1 = maxEigenValue(A, vs);
+    vs.push_back(e1.v);
+    lambdas.push_back(e1.l + x.l);
+
+    auto e2 = maxEigenValue(A, vs);
+    vs.push_back(e2.v);
+    lambdas.push_back(e2.l + x.l);
+
+    auto e3 = maxEigenValue(A, vs);
+    vs.push_back(e3.v);
+    lambdas.push_back(e3.l + x.l);
+
+
+    // выводим их в файлы
+    auto f = fopen("1.dat", "w");
+
+    fprintf(f, "# g^2 = %.6f\n", lambdas[0]);
+    for (size_t i = 0; i <= m; ++i)
+    {
+        for (size_t j = 0; j <= n; ++j)
         {
-            if (i == j)
-                A[i][j] = 2;
-            if (abs((int)i-(int)j) == 1)
-                A[i][j] = -1;
+            if (i == 0 || i == m || j == 0 || j == n)
+                fprintf(f, "%f %f 0\n", i * hx, j * hy);
+            else
+                fprintf(f, "%f %f %f\n", i * hx, j * hy, vs[0][(i-1) * (n-1) + (j-1)]);
         }
+        fprintf(f, "\n");
     }
-    for (auto i : getEigens(A))
-        cout << "l = " << i.l << ", v = " << i.v << endl << endl;
+    fclose(f);
 
-    freopen("res.dat", "w", stdout);
 
-    for (size_t k = 0; k < n; ++k)
+    f = fopen("2.dat", "w");
+
+    fprintf(f, "# g^2 = %.6f\n", lambdas[1]);
+    for (size_t i = 0; i <= m; ++i)
     {
-        for (auto i : getEigens(A))
-            cout << i.v[k] << " ";
-        cout << endl;
+        for (size_t j = 0; j <= n; ++j)
+        {
+            if (i == 0 || i == m || j == 0 || j == n)
+                fprintf(f, "%f %f 0\n", i * hx, j * hy);
+            else
+                fprintf(f, "%f %f %f\n", i * hx, j * hy, vs[1][(i-1) * (n-1) + (j-1)]);
+        }
+        fprintf(f, "\n");
     }
+    fclose(f);
+
+    f = fopen("3.dat", "w");
+
+    fprintf(f, "# g^2 = %.6f\n", lambdas[2]);
+    for (size_t i = 0; i <= m; ++i)
+    {
+        for (size_t j = 0; j <= n; ++j)
+        {
+            if (i == 0 || i == m || j == 0 || j == n)
+                fprintf(f, "%f %f 0\n", i * hx, j * hy);
+            else
+                fprintf(f, "%f %f %f\n", i * hx, j * hy, vs[2][(i-1) * (n-1) + (j-1)]);
+        }
+        fprintf(f, "\n");
+    }
+    fclose(f);
+
 }
