@@ -1,24 +1,11 @@
 CXX=g++
 CXXFLAGS=-std=c++11 -Wall -Wextra -O2
 LDFLAGS=
-SOURCES=linalg.cpp solvers.cpp test.cpp
+SOLVERS=linalg.cpp solvers.cpp test.cpp
+EIGENS=vector.cpp matrix.cpp test_h.cpp
 
-OBJS := $(patsubst %.cpp, %.o, $(SOURCES))
-DEPS := $(patsubst %.o, %.d, $(OBJS))
+solvers:
+	g++ $(CXXFLAGS) $(LDFLAGS) -o $@ $(SOLVERS)
 
-test: $(OBJS) $(DEPS)
-	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
-
-%.o: %.cpp %.d
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-%.d: %.cpp
-	@set -e; $(CXX) -M $< | \
-		sed -e 's%\($*\)\.o[ :]*%\1.o $@ : %g' > $@; \
-		[ -s $@ ] || rm -f $@
-	@echo create $@
-
-clean:
-	$(RM) test $(OBJS) $(DEPS) *~
-
--include $(DEPS)
+eigens:
+	g++ $(CXXFLAGS) $(LDFLAGS) -o $@ $(EIGENS)
