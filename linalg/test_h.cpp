@@ -12,31 +12,30 @@ int main()
         for (size_t j = 0; j <= n; ++j)
         {
             auto ind = i * (n+1) + j;
-            A[ind].emplace_back(ind, 2. / hx2 + 2 / hy2);
+            A[ind][ind] = 2. / hx2 + 2 / hy2;
             if (j > 0 && j < n)
             {
-                A[ind].emplace_back(ind-1, -1. / hy2);
-                A[ind].emplace_back(ind+1, -1. / hy2);
+                A[ind][ind-1] = -1. / hy2;
+                A[ind][ind+1] = -1. / hy2;
             }
             if (j == 0)
-                A[ind].emplace_back(ind+1, -2. / hy2);
+                A[ind][ind+1] = -2. / hy2;
             if (j == n)
-                A[ind].emplace_back(ind-1, -2. / hy2);
+                A[ind][ind-1] = -2. / hy2;
 
             if (i > 0 && i < m)
             {
-                A[ind].emplace_back(ind-n-1, -1. / hx2);
-                A[ind].emplace_back(ind+n+1, -1. / hx2);
+                A[ind][ind-n-1] = -1. / hx2;
+                A[ind][ind+n+1] = -1. / hx2;
             }
             if (i == 0)
-                A[ind].emplace_back(ind+n+1, -2. / hx2);
+                A[ind][ind+n+1] = -2. / hx2;
             if (i == m)
-                A[ind].emplace_back(ind-n-1, -2. / hx2);
+                A[ind][ind-n-1] = -2. / hx2;
         }
 
     auto x = maxEigenValue(A, {});
-    for (size_t i = 0; i < A.size(); ++i)
-        A[i][0].second -= x.l; // непереносимая штука, зависиот от реализации
+    A -= I(A.size()) * x.l;
 
     mat vs = {};
 

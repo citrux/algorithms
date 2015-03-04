@@ -5,39 +5,46 @@ vec operator * (const smat & a, const vec & b)
 {
     vec res(b.size());
     for (size_t i = 0; i < b.size(); ++i)
-        for (auto el : a[i])
+        for (auto el : a[i].data)
             res[i] += el.second * b[el.first];
     return res;
 }
 
-double & getFromSRow(srow & r, const size_t index)
+double & srow::operator[](const size_t index)
 {
     // линейный поиск по строке
-    sort(r.begin(), r.end());
-    auto iter = r.begin();
-    while (iter < r.end() and (*iter).first < index)
+    sort(data.begin(), data.end());
+    auto iter = data.begin();
+    while (iter < data.end() and (*iter).first < index)
         ++iter;
-    if (iter == r.end() or (*iter).first == index)
+    if (iter == data.end() or (*iter).first != index)
     {
-        r.emplace_back(index, 0);
-        iter = r.end() - 1;
+        data.emplace_back(index, 0);
+        iter = data.end() - 1;
     }
     return (*iter).second;
 }
 
-smat operator + (smat a, const smat & b)
+smat & operator += (smat & a, const smat & b)
 {
     for (size_t i = 0; i < b.size(); ++i)
-        for (auto el : b[i])
-            getFromSRow(a[i], el.first) += el.second;
+        for (auto el : b[i].data)
+            a[i][el.first] += el.second;
     return a;
 }
+
+smat operator + (smat a, const smat & b) { return a += b; }
+
+smat operator - (smat a) { return a * (-1); }
+smat & operator -= (smat & a, const smat & b) {return a +=-b; }
+smat operator - (smat a, const smat & b) { return a -= b; }
+
 
 smat I(const size_t n)
 {
     smat res(n);
     for (size_t i = 0; i < n; ++i)
-        res[i].emplace_back(i, 1);
+        res[i][i] = 1;
     return res;
 }
 
@@ -59,7 +66,7 @@ mat operator * (mat a, const double b)
 smat operator * (smat a, const double b)
 {
     for (auto & row : a)
-        for (auto & el : row)
+        for (auto & el : row.data)
             el.second *= b;
     return a;
 }
