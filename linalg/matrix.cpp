@@ -1,13 +1,31 @@
 #include <algorithm>
 #include "matrix.hpp"
 
-vec operator * (const smat & a, const vec & b)
+// Внутренняя реализация разреженной матрицы в виде списка разреженных строк
+// Разреженная строка -- вектор пар (индекс, значение)
+// Описаны операции над разреженными строками
+// Обёртка предоставляет интерфейс, скрывающий внутреннюю реализацию и
+// позволяет пользоваться srow как вектором
+double operator * (const srow & a, const vec & b)
 {
-    vec res(b.size());
-    for (size_t i = 0; i < b.size(); ++i)
-        for (auto el : a[i].data)
-            res[i] += el.second * b[el.first];
+    double res = 0;
+    for (auto el : a.data)
+            res += el.second * b[el.first];
     return res;
+}
+
+srow & operator *= (srow & a, const double b)
+{
+    for (auto & el : a.data)
+        el.second *= b;
+    return a;
+}
+
+srow & operator += (srow & a, const srow & b)
+{
+    for (auto el : b.data)
+        a[el.first] += el.second;
+    return a;
 }
 
 double & srow::operator[](const size_t index)
@@ -25,11 +43,20 @@ double & srow::operator[](const size_t index)
     return (*iter).second;
 }
 
+
+// Операции над разреженными матрицами
+vec operator * (const smat & a, const vec & b)
+{
+    vec res(b.size());
+    for (size_t i = 0; i < b.size(); ++i)
+        res[i] = a[i] * b;
+    return res;
+}
+
 smat & operator += (smat & a, const smat & b)
 {
     for (size_t i = 0; i < b.size(); ++i)
-        for (auto el : b[i].data)
-            a[i][el.first] += el.second;
+        a[i] += b[i];
     return a;
 }
 
@@ -39,7 +66,14 @@ smat operator - (smat a) { return a * (-1); }
 smat & operator -= (smat & a, const smat & b) {return a +=-b; }
 smat operator - (smat a, const smat & b) { return a -= b; }
 
+smat operator * (smat a, const double b)
+{
+    for (auto & row : a)
+        row *= b;
+    return a;
+}
 
+// единичная разреженная матрица
 smat I(const size_t n)
 {
     smat res(n);
@@ -48,6 +82,7 @@ smat I(const size_t n)
     return res;
 }
 
+// операции над обычными матрицами
 vec operator * (const mat & a, const vec & b)
 {
     vec res(b.size());
@@ -63,10 +98,4 @@ mat operator * (mat a, const double b)
     return a;
 }
 
-smat operator * (smat a, const double b)
-{
-    for (auto & row : a)
-        for (auto & el : row.data)
-            el.second *= b;
-    return a;
-}
+
