@@ -3,8 +3,6 @@
 
 using namespace std;
 
-typedef vector<double> vec;
-
 double operator * (const vec & a, const vec & b)
 {
     double res = 0;
@@ -44,12 +42,3 @@ vec operator - (vec a, const vec & b)
 {
     return a -= b;
 }
-
-ostream & operator << (ostream &os, const vec &v)
-{
-    for(auto i : v)
-        os << i << " ";
-    return os;
-}
-double norm(const vec & a) {return sqrt(a * a);}
-

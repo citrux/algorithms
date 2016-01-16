@@ -1,11 +1,22 @@
 CXX=g++
 CXXFLAGS=-std=c++11 -Wall -Wextra -O2
 LDFLAGS=
-SOLVERS=linalg.cpp solvers.cpp test.cpp
-EIGENS=vector.cpp matrix.cpp test_h.cpp
+SRC=$(wildcard *.cpp)
+OBJ=$(patsubst %.cpp, %.o, $(SRC))
 
-solvers:
-	g++ $(CXXFLAGS) $(LDFLAGS) -o $@ $(SOLVERS)
+test: $(OBJ)
+	$(CXX) $(LDFLAGS) $(OBJ) -o test
 
-eigens:
-	g++ $(CXXFLAGS) $(LDFLAGS) -o $@ $(EIGENS)
+depend: .depend
+
+.depend: $(SRCS)
+	rm -f .depend
+	$(CXX) $(CXXFLAGS) -MM $^ -o .depend;
+
+clean:
+	$(RM) $(OBJ)
+
+dist-clean: clean
+	$(RM) *~ .depend
+
+include .depend

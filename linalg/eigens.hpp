@@ -1,7 +1,15 @@
 #pragma once
+#include <string>
 #include "matrix.hpp"
 
-struct eigen {double l; vec v;};
+struct eigen {
+    double l;
+    vec v;
+ };
+
+std::string to_string(const eigen & e) {
+    return to_string(e.l) + ", " + to_string(e.v);
+}
 
 void orthogonalize(vec & a, const mat & vs)
 {

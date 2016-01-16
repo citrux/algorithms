@@ -1,10 +1,10 @@
 #include "linalg.hpp"
 
-v jacobi( m A, v b, double eps )
+vec jacobi( mat A, vec b, double eps )
 {
     auto n = b.size();
-    v x(n);
-    v delta(n);
+    vec x(n);
+    vec delta(n);
     do {
         for (auto i = 0u; i < n; ++i)
         {
@@ -21,11 +21,11 @@ v jacobi( m A, v b, double eps )
     return x;
 }
 
-v seidel( m A, v b, double eps )
+vec seidel( mat A, vec b, double eps )
 {
     auto n = b.size();
-    v x(n);
-    v delta(n);
+    vec x(n);
+    vec delta(n);
     do {
         for (auto i = 0u; i < n; ++i)
         {
@@ -41,11 +41,11 @@ v seidel( m A, v b, double eps )
     return x;
 }
 
-v sor( m A, v b, double w, double eps )
+vec sor( mat A, vec b, double w, double eps )
 {
     auto n = b.size();
-    v x(n);
-    v delta(n);
+    vec x(n);
+    vec delta(n);
     do {
         for (auto i = 0u; i < n; ++i)
         {

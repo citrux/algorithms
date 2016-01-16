@@ -99,3 +99,16 @@ mat operator * (mat a, const double b)
 }
 
 
+double norm( mat A )
+{
+    double res = 0;
+    for ( auto i: A )
+    {
+        double s = 0;
+        for ( auto j: i )
+            s += std::abs( j );
+        if ( s > res )
+            res = s;
+    }
+    return res;
+}

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-typedef vector<double> vec;
+using vec = vector<double>;
 
 double operator * (const vec & a, const vec & b);
 vec & operator *= (vec & a, const double b);
@@ -13,6 +13,22 @@ vec & operator /= (vec & a, const double b);
 vec operator / (vec a, const double b);
 vec & operator -= (vec & a, vec b);
 vec operator - (vec a, const vec & b);
-ostream & operator << (ostream &os, const vec &v);
-double norm(const vec & a);
+inline double norm(const vec & a) {return sqrt(a * a);}
 
+template <typename T>
+ostream & operator << (ostream &os, const vector<T> &v)
+{
+    for(auto i : v)
+        os << to_string(i) << " ";
+    return os;
+}
+
+template <typename T>
+string to_string(const vector<T> &v)
+{
+    string out = "{ ";
+    for(auto i : v)
+        out += to_string(i) + ", ";
+    out += " }";
+    return out;
+}

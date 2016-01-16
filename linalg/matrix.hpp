@@ -1,7 +1,8 @@
 #pragma once
 #include "vector.hpp"
 
-typedef vector<vec> mat;
+using mat = vector<vec>;
+
 struct srow // sparse row
 {
     vector<pair<size_t, double>> data;
@@ -22,3 +23,5 @@ smat I(const size_t n);
 
 vec operator * (const mat & a, const vec & b);
 mat operator * (mat a, const double b);
+
+double norm( mat A );
